@@ -25,6 +25,7 @@ pipeline {
                     docker build -f Dockerfile --build-arg jar_name=${JAR_NAME} -t ${IMAGE_NAME}:${VERSION_ID} .
                     
                     new_image_id=`docker images|grep ${IMAGE_NAME}|grep ${VERSION_ID}|awk '{print $3}'`
+					docker login -u 519989121 -p Admin123456789. ccr.ccs.tencentyun.com
                     docker tag ${new_image_id} ${IMAGE_ADDR}:${VERSION_ID}
                     docker push ${IMAGE_ADDR}:${VERSION_ID}
                 '''
