@@ -1,0 +1,34 @@
+pipeline {
+    agent {label 'master'}
+    environment {
+        PROJECT_NAME="${JOB_NAME}"  			        // 项目名
+        IMAGE_NAME="jenkins_test"                    // 镜像名一般和项目名相同
+        IMAGE_ADDR="ccr.ccs.tencentyun.com/center_repo/${IMAGE_NAME}"    // 镜像的位置
+        VERSION_ID="${BUILD_ID}"
+    }
+    stages {
+        stage('pullCode'){
+            steps{
+                echo 'This is a pullCode step'
+                checkout scm
+            }
+        }
+        stage('ssh') {
+            steps{
+                echo 'publish docker image'
+                sh '''
+                    ole_image_id=`docker images|grep ${IMAGE_NAME}|grep ${VERSION_ID}|awk '{print $3}'`
+                    if [[ -n "${ole_image_id}" ]]; then
+                        docker rmi -f ${ole_image_id}
+                    fi
+                    
+                    docker build -f Dockerfile --build-arg jar_name=${JAR_NAME} -t ${IMAGE_NAME}:${VERSION_ID} .
+                    
+                    new_image_id=`docker images|grep ${IMAGE_NAME}|grep ${VERSION_ID}|awk '{print $3}'`
+                    sudo docker tag ${new_image_id} ${IMAGE_ADDR}:${VERSION_ID}
+                    sudo docker push ${IMAGE_ADDR}:${VERSION_ID}
+                '''
+            }
+        }
+    }
+}
