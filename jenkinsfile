@@ -17,7 +17,8 @@ pipeline {
             steps{
                 echo 'publish docker image'
 				echo "Build ID: ${BUILD_ID}"
-                bash '''
+                sh '''
+					#!/bin/bash
                     ole_image_id=`docker images|grep ${IMAGE_NAME}|grep ${VERSION_ID}|awk '{print $3}'`
                     if [[ -n "${ole_image_id}" ]]; then
                         docker rmi -f ${ole_image_id}
