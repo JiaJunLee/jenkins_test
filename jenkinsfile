@@ -25,8 +25,8 @@ pipeline {
                     docker build -f Dockerfile --build-arg jar_name=${JAR_NAME} -t ${IMAGE_NAME}:${VERSION_ID} .
                     
                     new_image_id=`docker images|grep ${IMAGE_NAME}|grep ${VERSION_ID}|awk '{print $3}'`
-                    sudo docker tag ${new_image_id} ${IMAGE_ADDR}:${VERSION_ID}
-                    sudo docker push ${IMAGE_ADDR}:${VERSION_ID}
+                    docker tag ${new_image_id} ${IMAGE_ADDR}:${VERSION_ID}
+                    docker push ${IMAGE_ADDR}:${VERSION_ID}
                 '''
             }
         }
